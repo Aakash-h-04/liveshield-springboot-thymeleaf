@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LiveShield · Visitors</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- =====================================================
+       SIDEBAR
+       ===================================================== -->
+
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+        <nav>
+          <a href="/"> Dashboard </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/livestock(farmId=${farms[0].id})}"
+          >
+            Livestock
+          </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/veterinary(farmId=${farms[0].id})}"
+          >
+            Veterinary
+          </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/daily-log(farmId=${farms[0].id})}"
+          >
+            Daily Log
+          </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/risk-assessment(farmId=${farms[0].id})}"
+          >
+            Risk Assessment
+          </a>
+
+          <a href="/alerts"> Alerts </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/compliance-passport(farmId=${farms[0].id})}"
+          >
+            Compliance Passport
+          </a>
+
+          <a href="/guides"> Guides </a>
+
+          <a class="active" href="/visitors"> Visitors </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+
+      <!-- =====================================================
+       MAIN CONTENT
+       ===================================================== -->
+
+      <main class="main">
+        <!-- PAGE HEADER -->
+
+        <header class="topbar">
+          <div>
+            <span class="eyebrow"> BIOSECURITY </span>
+
+            <h1>Visitor Management</h1>
+          </div>
+        </header>
+
+        <!-- =================================================
+         INTRO
+         ================================================= -->
+
+        <section class="welcome">
+          <div>
+            <h2>Manage verified farm visitors</h2>
+
+            <p>
+              Register vendors, distributors and other authorized visitors and
+              verify their biosecurity status before entry.
+            </p>
+          </div>
+
+          <a href="/visitors/register" class="button primary">
+            + Register Visitor
+          </a>
+        </section>
+
+        <!-- =================================================
+         ACTIVE VISITORS
+         ================================================= -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Active Visitors</h3>
+
+              <p>Visitors currently checked in to a farm.</p>
+            </div>
+
+            <span class="verification-status" th:text="${activeVisits.size()}">
+              0
+            </span>
+          </div>
+
+          <!-- No active visitors -->
+
+          <div th:if="${activeVisits.isEmpty()}" class="empty">
+            No visitors are currently checked in.
+          </div>
+
+          <!-- Active visitor table -->
+
+          <div th:if="${!activeVisits.isEmpty()}" class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Visitor</th>
+
+                  <th>Farm</th>
+
+                  <th>Purpose</th>
+
+                  <th>Check-in</th>
+
+                  <th>Pass</th>
+
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="visit : ${activeVisits}">
+                  <!-- Visitor -->
+
+                  <td>
+                    <strong th:text="${visit.visitor.fullName}">
+                      Visitor
+                    </strong>
+
+                    <small th:text="${visit.visitor.visitorCode}">
+                      VST-XXXX-XXXX-XXXX
+                    </small>
+                  </td>
+
+                  <!-- Farm -->
+
+                  <td th:text="${visit.farm.name}">Farm</td>
+
+                  <!-- Purpose -->
+
+                  <td th:text="${visit.purpose}">Delivery</td>
+
+                  <!-- Check-in -->
+
+                  <td
+                    th:text="${#temporals.format(
+                visit.checkInTime,
+                'dd MMM yyyy, hh:mm a'
+              )}"
+                  >
+                    —
+                  </td>
+
+                  <!-- Pass -->
+
+                  <td>
+                    <span class="badge verified"> ACTIVE </span>
+                  </td>
+
+                  <!-- Action -->
+
+                  <td>
+                    <div class="form-actions">
+                      <a
+                        th:href="@{'/visitors/'
+        + ${visit.visitor.visitorCode}}"
+                        class="button secondary"
+                      >
+                        View
+                      </a>
+
+                      <form
+                        method="post"
+                        th:action="@{'/visitors/check-out/'
+        + ${visit.id}}"
+                        style="display: inline"
+                      >
+                        <button
+                          type="submit"
+                          class="button secondary"
+                          onclick="
+                            return confirm(
+                              'Check out this visitor from the farm?',
+                            );
+                          "
+                        >
+                          Check Out
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- =================================================
+         QUICK ACTIONS
+         ================================================= -->
+
+        <section class="content-grid">
+          <!-- SCAN -->
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Scan Visitor ID</h3>
+
+                <p>
+                  Scan a visitor's QR code or barcode to retrieve their
+                  registered profile.
+                </p>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <a href="/visitors/scan" class="button primary"> Scan Visitor </a>
+            </div>
+          </div>
+
+          <!-- LOOKUP -->
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Find Visitor</h3>
+
+                <p>
+                  Already know the visitor's permanent ID? Look up their profile
+                  directly.
+                </p>
+              </div>
+            </div>
+
+            <form action="/visitors/lookup" method="get">
+              <label>
+                Visitor ID
+
+                <input
+                  type="text"
+                  name="visitorCode"
+                  placeholder="VST-XXXX-XXXX-XXXX"
+                  required
+                />
+              </label>
+
+              <div class="form-actions">
+                <button type="submit" class="button secondary">
+                  Find Visitor
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- =================================================
+         VISITOR WORKFLOW
+         ================================================= -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Visitor entry workflow</h3>
+
+              <p>
+                Every visitor should pass through the verification process
+                before entering the farm.
+              </p>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <!-- STEP 1 -->
+
+            <div>
+              <strong> 1. Identify </strong>
+
+              <p>Scan the visitor's registered QR code or barcode.</p>
+            </div>
+
+            <!-- STEP 2 -->
+
+            <div>
+              <strong> 2. Verify </strong>
+
+              <p>Check identity, licence and biosecurity information.</p>
+            </div>
+
+            <!-- STEP 3 -->
+
+            <div>
+              <strong> 3. Decide </strong>
+
+              <p>Allow, review or deny farm entry.</p>
+            </div>
+
+            <!-- STEP 4 -->
+
+            <div>
+              <strong> 4. Record </strong>
+
+              <p>
+                Create a digital visit record and issue an e-Pass when
+                permitted.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

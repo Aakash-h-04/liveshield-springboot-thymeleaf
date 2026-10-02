@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: liveshield-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: liveshield
+      POSTGRES_USER: liveshield
+      POSTGRES_PASSWORD: liveshield
+    ports:
+      - "5432:5432"
+    volumes:
+      - liveshield_pgdata:/var/lib/postgresql/data
+volumes:
+  liveshield_pgdata:

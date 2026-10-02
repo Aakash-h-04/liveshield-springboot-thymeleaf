@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LiveShield · Visitor Profile</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+
+        <nav>
+          <a href="/"> Dashboard </a>
+
+          <a class="active" href="/visitors"> Visitors </a>
+
+          <a href="/guides"> Guides </a>
+
+          <a href="/alerts"> Alerts </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow"> VISITOR PROFILE </span>
+
+            <h1>Visitor Details</h1>
+          </div>
+        </header>
+
+        <section class="welcome">
+          <div>
+            <h2 th:text="${profile.visitor.fullName}">Visitor Name</h2>
+
+            <p>Registered LiveShield visitor identity</p>
+          </div>
+
+          <a href="/visitors" class="button secondary"> ← Visitors </a>
+        </section>
+
+        <!-- IDENTITY -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Visitor Identity</h3>
+
+              <p>Permanent identity associated with this visitor.</p>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div>
+              <small>Visitor ID</small>
+
+              <strong th:text="${profile.visitor.visitorCode}">
+                VST-XXXX-XXXX-XXXX
+              </strong>
+            </div>
+
+            <div>
+              <small>Mobile</small>
+
+              <strong th:text="${profile.visitor.mobile}"> — </strong>
+            </div>
+
+            <div>
+              <small>Company</small>
+
+              <strong
+                th:text="${profile.visitor.companyName != null
+                      ? profile.visitor.companyName
+                      : '—'}"
+              >
+                —
+              </strong>
+            </div>
+
+            <div>
+              <small>Visitor Type</small>
+
+              <strong
+                th:text="${profile.visitor.visitorType != null
+                      ? profile.visitor.visitorType
+                      : '—'}"
+              >
+                —
+              </strong>
+            </div>
+          </div>
+          <div class="visitor-qr">
+            <img
+              th:src="'data:image/png;base64,' + ${qrCode}"
+              alt="Visitor QR Code"
+              width="220"
+              height="220"
+            />
+
+            <div></div>
+
+            <small> Scan this code to identify the visitor </small>
+          </div>
+        </section>
+
+        <!-- LICENCE -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Professional Licence</h3>
+
+              <p>Licence verification status.</p>
+            </div>
+          </div>
+
+          <!-- Licence exists -->
+          <div th:if="${profile.licence != null}">
+            <div class="content-grid">
+              <!-- Licence Number -->
+              <div>
+                <small>Licence Number</small>
+
+                <strong th:text="${profile.licence.licenceNumber}"> — </strong>
+              </div>
+
+              <!-- Licence Type -->
+              <div>
+                <small>Licence Type</small>
+
+                <strong th:text="${profile.licence.licenceType}"> — </strong>
+              </div>
+
+              <!-- Issuing Authority -->
+              <div>
+                <small>Issuing Authority</small>
+
+                <strong
+                  th:text="${profile.licence.issuingAuthority != null
+              ? profile.licence.issuingAuthority
+              : '—'}"
+                >
+                  —
+                </strong>
+              </div>
+
+              <!-- Issue Date -->
+              <div>
+                <small>Issue Date</small>
+
+                <strong
+                  th:text="${profile.licence.issueDate != null
+              ? profile.licence.issueDate
+              : '—'}"
+                >
+                  —
+                </strong>
+              </div>
+
+              <!-- Expiry Date -->
+              <div>
+                <small>Expiry Date</small>
+
+                <strong
+                  th:text="${profile.licence.expiryDate != null
+              ? profile.licence.expiryDate
+              : '—'}"
+                >
+                  —
+                </strong>
+              </div>
+
+              <!-- Verification Status -->
+              <div>
+                <small>Status</small>
+
+                <span
+                  class="badge"
+                  th:classappend="${#strings.toLowerCase(
+              profile.licence.verificationStatus
+          )}"
+                  th:text="${profile.licence.verificationStatus}"
+                >
+                  PENDING
+                </span>
+              </div>
+            </div>
+
+            <!-- Licence actions -->
+            <div
+              th:if="${profile.licence.verificationStatus == 'PENDING'}"
+              class="page-actions"
+            >
+              <a
+                th:href="@{'/visitors/licence/'
+            + ${profile.licence.id}
+            + '/review'}"
+                class="btn btn-primary"
+              >
+                Review Licence
+              </a>
+            </div>
+
+            <!-- Already verified -->
+            <div
+              th:if="${profile.licence.verificationStatus == 'VERIFIED'}"
+              class="page-actions"
+            >
+              <span class="verification-note">
+                This licence has been verified.
+              </span>
+            </div>
+
+            <!-- Rejected -->
+            <div
+              th:if="${profile.licence.verificationStatus == 'REJECTED'}"
+              class="page-actions"
+            >
+              <span class="verification-note">
+                This licence has been rejected.
+              </span>
+            </div>
+          </div>
+
+          <!-- No licence -->
+          <div th:if="${profile.licence == null}" class="empty">
+            No professional licence has been registered.
+          </div>
+        </section>
+
+        <!-- BIOSECURITY -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Biosecurity Profile</h3>
+
+              <p>Information relevant to farm-entry verification.</p>
+            </div>
+          </div>
+
+          <div
+            th:if="${profile.biosecurityProfile != null}"
+            class="content-grid"
+          >
+            <div>
+              <small> Recent Livestock Contact </small>
+
+              <strong
+                th:text="${profile.biosecurityProfile.recentLivestockContact
+                      ? 'YES'
+                      : 'NO'}"
+              >
+                NO
+              </strong>
+            </div>
+
+            <div>
+              <small> Recent Poultry Contact </small>
+
+              <strong
+                th:text="${profile.biosecurityProfile.recentPoultryContact
+                      ? 'YES'
+                      : 'NO'}"
+              >
+                NO
+              </strong>
+            </div>
+
+            <div>
+              <small> Recent Sick-Animal Contact </small>
+
+              <strong
+                th:text="${profile.biosecurityProfile.recentSickAnimalContact
+                      ? 'YES'
+                      : 'NO'}"
+              >
+                NO
+              </strong>
+            </div>
+
+            <div>
+              <small> Last Farm Visit </small>
+
+              <strong
+                th:text="${profile.biosecurityProfile.lastFarmVisitDate != null
+                      ? profile.biosecurityProfile.lastFarmVisitDate
+                      : 'No record'}"
+              >
+                No record
+              </strong>
+            </div>
+
+            <div>
+              <small> Health Declaration </small>
+
+              <strong th:text="${profile.biosecurityProfile.healthDeclaration}">
+                NOT_PROVIDED
+              </strong>
+            </div>
+
+            <div>
+              <small> Biosecurity Status </small>
+
+              <span
+                class="badge"
+                th:classappend="${#strings.toLowerCase(
+                profile.biosecurityProfile.biosecurityStatus
+            )}"
+                th:text="${profile.biosecurityProfile.biosecurityStatus}"
+              >
+                REVIEW_REQUIRED
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+     RECENT FARM CONTACTS
+     ===================================================== -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Recent Farm Contacts</h3>
+
+              <p>Most recent farms visited by this visitor.</p>
+            </div>
+
+            <span
+              class="verification-status"
+              th:text="${recentFarmVisits.size()}"
+            >
+              0
+            </span>
+          </div>
+
+          <!-- No recent farm contacts -->
+
+          <div th:if="${recentFarmVisits.isEmpty()}" class="empty">
+            No previous farm contacts have been recorded.
+          </div>
+
+          <!-- Recent farm contacts -->
+
+          <div th:if="${!recentFarmVisits.isEmpty()}" class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Farm</th>
+
+                  <th>Farm Type</th>
+
+                  <th>Purpose</th>
+
+                  <th>Visit Date</th>
+
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="visit : ${recentFarmVisits}">
+                  <!-- Farm -->
+
+                  <td>
+                    <strong th:text="${visit.farm.name}"> Farm </strong>
+
+                    <small
+                      th:if="${visit.farm.location != null}"
+                      th:text="${visit.farm.location}"
+                    >
+                      Location
+                    </small>
+                  </td>
+
+                  <!-- Farm Type -->
+
+                  <td th:text="${visit.farm.farmType}">Poultry</td>
+
+                  <!-- Purpose -->
+
+                  <td th:text="${visit.purpose}">Delivery</td>
+
+                  <!-- Visit Date -->
+
+                  <td
+                    th:text="${#temporals.format(
+              visit.checkInTime,
+              'dd MMM yyyy'
+            )}"
+                  >
+                    —
+                  </td>
+
+                  <!-- Status -->
+
+                  <td>
+                    <span
+                      th:if="${visit.checkOutTime == null}"
+                      class="badge verified"
+                    >
+                      ACTIVE
+                    </span>
+
+                    <span th:if="${visit.checkOutTime != null}" class="badge">
+                      COMPLETED
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <!-- =====================================================
+     VISIT HISTORY
+     ===================================================== -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Visit History</h3>
+
+              <p>Previous and current farm visits recorded for this visitor.</p>
+            </div>
+
+            <span class="verification-status" th:text="${visitHistory.size()}">
+              0
+            </span>
+          </div>
+
+          <!-- No visits -->
+
+          <div th:if="${visitHistory.isEmpty()}" class="empty">
+            No farm visits have been recorded for this visitor.
+          </div>
+
+          <!-- Visit history -->
+
+          <div th:if="${!visitHistory.isEmpty()}" class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Farm</th>
+
+                  <th>Purpose</th>
+
+                  <th>Check-in</th>
+
+                  <th>Check-out</th>
+
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="visit : ${visitHistory}">
+                  <!-- Farm -->
+
+                  <td>
+                    <strong th:text="${visit.farm.name}"> Farm </strong>
+
+                    <small
+                      th:if="${visit.farm.location != null}"
+                      th:text="${visit.farm.location}"
+                    >
+                      Location
+                    </small>
+                  </td>
+
+                  <!-- Purpose -->
+
+                  <td th:text="${visit.purpose}">Delivery</td>
+
+                  <!-- Check-in -->
+
+                  <td
+                    th:text="${#temporals.format(
+              visit.checkInTime,
+              'dd MMM yyyy, hh:mm a'
+            )}"
+                  >
+                    —
+                  </td>
+
+                  <!-- Check-out -->
+
+                  <td>
+                    <span th:if="${visit.checkOutTime == null}">
+                      Still inside
+                    </span>
+
+                    <span
+                      th:if="${visit.checkOutTime != null}"
+                      th:text="${#temporals.format(
+                visit.checkOutTime,
+                'dd MMM yyyy, hh:mm a'
+              )}"
+                    >
+                      —
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+
+                  <td>
+                    <span
+                      th:if="${visit.checkOutTime == null}"
+                      class="badge verified"
+                    >
+                      ACTIVE
+                    </span>
+
+                    <span th:if="${visit.checkOutTime != null}" class="badge">
+                      COMPLETED
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ACTIONS -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Visitor Actions</h3>
+
+              <p>Actions available for this visitor.</p>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="button primary" type="button" disabled>
+              Generate Visitor QR
+            </button>
+
+            <button class="button secondary" type="button" disabled>
+              Start Farm Check-in
+            </button>
+          </div>
+
+          <p class="muted">
+            QR generation and farm check-in will be enabled after the
+            verification workflow is implemented.
+          </p>
+
+          <a
+            th:href="@{'/visitors/' + ${profile.visitor().visitorCode} + '/verify'}"
+            class="btn btn-primary"
+          >
+            Verify for Farm Entry
+          </a>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

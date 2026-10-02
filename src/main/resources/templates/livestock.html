@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Livestock | LiveShield</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Dashboard -->
+          <a href="/"> Dashboard </a>
+
+          <!-- Livestock -->
+          <a class="active" th:href="@{/livestock(farmId=${farm.id})}">
+            Livestock
+          </a>
+
+          <!-- Veterinary -->
+          <a th:href="@{/veterinary(farmId=${farm.id})}"> Veterinary </a>
+
+          <!-- Daily Log -->
+          <a th:href="@{/daily-log(farmId=${farm.id})}"> Daily Log </a>
+
+          <!-- Risk Assessment -->
+          <a th:href="@{/risk-assessment(farmId=${farm.id})}">
+            Risk Assessment
+          </a>
+
+          <!-- Alerts -->
+          <a href="/alerts"> Alerts </a>
+
+          <!-- Compliance Passport -->
+          <a th:href="@{/compliance-passport(farmId=${farm.id})}">
+            Compliance Passport
+          </a>
+
+          <!-- Guides -->
+          <a href="/guides"> Guides </a>
+
+          <a href="/visitors"> Visitors</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">FARM OPERATIONS</div>
+
+            <h1>Livestock</h1>
+          </div>
+
+          <div class="top-actions">
+            <div class="avatar">LS</div>
+          </div>
+        </header>
+
+        <section class="welcome">
+          <div>
+            <h2 th:text="${farm.name}">Farm</h2>
+
+            <p>Livestock batches and health status</p>
+          </div>
+
+          <a
+            th:href="@{/livestock/new(farmId=${farm.id})}"
+            class="button primary"
+          >
+            Add Batch
+          </a>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Livestock Batches</h3>
+
+              <p>Current livestock groups registered on this farm</p>
+            </div>
+          </div>
+
+          <div th:if="${#lists.isEmpty(batches)}" class="empty">
+            No livestock batches have been added yet.
+          </div>
+
+          <div th:unless="${#lists.isEmpty(batches)}" class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Batch</th>
+                  <th>Species</th>
+                  <th>Breed</th>
+                  <th>Animals</th>
+                  <th>Arrival</th>
+                  <th>Source</th>
+                  <th>Health</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="batch : ${batches}">
+                  <td>
+                    <strong th:text="${batch.batchCode}"> B001 </strong>
+                  </td>
+
+                  <td th:text="${batch.species}">Poultry</td>
+
+                  <td th:text="${batch.breed ?: '-'}">-</td>
+
+                  <td th:text="${batch.animalCount}">0</td>
+
+                  <td th:text="${batch.arrivalDate ?: '-'}">-</td>
+
+                  <td th:text="${batch.source ?: '-'}">-</td>
+
+                  <td>
+                    <span
+                      class="badge"
+                      th:classappend="${#strings.toLowerCase(
+                                    batch.healthStatus
+                                )}"
+                      th:text="${batch.healthStatus}"
+                    >
+                      HEALTHY
+                    </span>
+                  </td>
+
+                  <td>
+                    <a
+                      class="text-link"
+                      th:href="@{/livestock/{id}/edit(
+                                    id=${batch.id},
+                                    farmId=${farm.id}
+                                )}"
+                    >
+                      Edit
+                    </a>
+
+                    <form
+                      th:action="@{/livestock/{id}/delete(
+                                    id=${batch.id}
+                                )}"
+                      method="post"
+                      style="display: inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="farmId"
+                        th:value="${farm.id}"
+                      />
+
+                      <button
+                        type="submit"
+                        class="text-link"
+                        style="border: 0; background: none; cursor: pointer"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Farm Check-in | LiveShield</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <h2>LiveShield</h2>
+          <span>BioSecurity Companion</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="/">Dashboard</a>
+
+          <a href="/livestock">Livestock</a>
+
+          <a href="/veterinary">Veterinary</a>
+
+          <a href="/daily-log">Daily Log</a>
+
+          <a href="/risk-assessment">Risk Assessment</a>
+
+          <a href="/alerts">Alerts</a>
+
+          <a href="/compliance-passport"> Compliance Passport </a>
+
+          <a href="/guides">Guides</a>
+
+          <a href="/visitors" class="active"> Visitors </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1>Farm Check-in</h1>
+
+            <p>Record the visitor's entry into the farm.</p>
+          </div>
+
+          <a href="/visitors" class="btn btn-secondary"> Back </a>
+        </div>
+
+        <!-- VISITOR -->
+        <section class="card">
+          <h2>Visitor</h2>
+
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label"> Name </span>
+
+              <strong th:text="${profile.visitor().fullName}">
+                Visitor Name
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Visitor ID </span>
+
+              <strong th:text="${profile.visitor().visitorCode}">
+                VST-XXXX-XXXX-XXXX
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Company </span>
+
+              <strong
+                th:text="${profile.visitor().companyName != null
+                            ? profile.visitor().companyName
+                            : '—'}"
+              >
+                —
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Visitor Type </span>
+
+              <strong
+                th:text="${profile.visitor().visitorType != null
+                            ? profile.visitor().visitorType
+                            : '—'}"
+              >
+                —
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- CHECK-IN FORM -->
+        <section class="card">
+          <h2>Visit Details</h2>
+
+          <form
+            class="visitor-form"
+            method="post"
+            th:action="@{'/visitors/'
+                    + ${profile.visitor().visitorCode}
+                    + '/check-in'}"
+          >
+            <div class="form-section">
+              <div class="form-grid">
+                <!-- FARM -->
+                <div>
+                  <label for="farmId"> Destination Farm </label>
+
+                  <select id="farmId" name="farmId" required>
+                    <option value="">Select farm</option>
+
+                    <option
+                      th:each="farm : ${farms}"
+                      th:value="${farm.id}"
+                      th:text="${farm.name}"
+                    >
+                      Farm
+                    </option>
+                  </select>
+                </div>
+
+                <!-- PURPOSE -->
+                <div>
+                  <label for="purpose"> Purpose of Visit </label>
+
+                  <select id="purpose" name="purpose" required>
+                    <option value="">Select purpose</option>
+
+                    <option value="DELIVERY">Delivery</option>
+
+                    <option value="MAINTENANCE">Maintenance</option>
+
+                    <option value="VETERINARY">Veterinary Service</option>
+
+                    <option value="INSPECTION">Inspection</option>
+
+                    <option value="MEETING">Meeting</option>
+
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+
+                <!-- VEHICLE -->
+                <div>
+                  <label for="vehicleNumber">
+                    Vehicle Number
+                    <span style="font-weight: 400; color: #758078">
+                      (Optional)
+                    </span>
+                  </label>
+
+                  <input
+                    id="vehicleNumber"
+                    name="vehicleNumber"
+                    type="text"
+                    placeholder="e.g. KA01AB1234"
+                    maxlength="20"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="page-actions">
+              <a
+                th:href="@{'/visitors/'
+                            + ${profile.visitor().visitorCode}}"
+                class="btn btn-secondary"
+              >
+                Cancel
+              </a>
+
+              <button type="submit" class="btn btn-primary">
+                Check In Visitor
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

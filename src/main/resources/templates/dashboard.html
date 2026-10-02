@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>LiveShield · Dashboard</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- =========================================================
+           SIDEBAR
+           ========================================================= -->
+
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Dashboard -->
+          <a class="active" href="/"> Dashboard </a>
+
+          <!-- Farm modules -->
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/livestock(farmId=${farms[0].id})}"
+          >
+            Livestock
+          </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/veterinary(farmId=${farms[0].id})}"
+          >
+            Veterinary
+          </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/daily-log(farmId=${farms[0].id})}"
+          >
+            Daily Log
+          </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/risk-assessment(farmId=${farms[0].id})}"
+          >
+            Risk Assessment
+          </a>
+
+          <!-- Global alerts -->
+          <a href="/alerts"> Alerts </a>
+
+          <a
+            th:if="${!#lists.isEmpty(farms)}"
+            th:href="@{/compliance-passport(farmId=${farms[0].id})}"
+          >
+            Compliance Passport
+          </a>
+          <a href="/guides">Guides</a>
+          <a href="/visitors"> Visitors</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+
+      <!-- =========================================================
+           MAIN CONTENT
+           ========================================================= -->
+
+      <main class="main">
+        <!-- =======================================================
+             TOPBAR
+             ======================================================= -->
+
+        <header class="topbar">
+          <div>
+            <span class="eyebrow"> FARM OPERATIONS </span>
+
+            <h1>Dashboard</h1>
+          </div>
+
+          <div class="top-actions">
+            <div class="avatar">LS</div>
+          </div>
+        </header>
+
+        <!-- =======================================================
+             WELCOME
+             ======================================================= -->
+
+        <section class="welcome">
+          <div>
+            <h2>Farm overview</h2>
+
+            <p>Monitor livestock, compliance, risk and biosecurity activity.</p>
+          </div>
+
+          <a class="button primary" href="/farms/new"> + Add Farm </a>
+        </section>
+
+        <!-- =======================================================
+             MAIN METRICS
+             ======================================================= -->
+
+        <section class="metrics">
+          <!-- Farms -->
+
+          <div class="metric">
+            <span> Farms </span>
+
+            <strong th:text="${farmCount}"> 0 </strong>
+
+            <small> registered farms </small>
+          </div>
+
+          <!-- Livestock -->
+
+          <div class="metric">
+            <span> Livestock </span>
+
+            <strong th:text="${livestockTotal}"> 0 </strong>
+
+            <small> animals recorded </small>
+          </div>
+
+          <!-- Compliance -->
+
+          <div class="metric">
+            <span> Average Compliance </span>
+
+            <strong th:text="${averageCompliance + '%'}"> 0% </strong>
+
+            <small> across farms </small>
+          </div>
+
+          <!-- Alerts -->
+
+          <div class="metric">
+            <span> Active Alerts </span>
+
+            <strong th:text="${activeAlertCount}"> 0 </strong>
+
+            <small> require attention </small>
+          </div>
+        </section>
+
+        <!-- =======================================================
+             SECONDARY STATUS
+             ======================================================= -->
+
+        <section class="metrics" style="margin-top: 12px">
+          <!-- High Risk -->
+
+          <div class="metric">
+            <span> High Risk Farms </span>
+
+            <strong th:text="${highRiskCount}"> 0 </strong>
+
+            <small> current risk status </small>
+          </div>
+
+          <!-- Sick Batches -->
+
+          <div class="metric">
+            <span> Sick Batches </span>
+
+            <strong th:text="${sickBatchCount}"> 0 </strong>
+
+            <small> livestock batches </small>
+          </div>
+        </section>
+
+        <!-- =======================================================
+             REGISTERED FARMS
+             ======================================================= -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Registered Farms</h3>
+
+              <p>Current farm status</p>
+            </div>
+
+            <a href="/farms/new" class="text-link"> Add Farm → </a>
+          </div>
+
+          <!-- No farms -->
+
+          <div th:if="${#lists.isEmpty(farms)}" class="empty">
+            <p>No farms yet. Add your first farm to start using LiveShield.</p>
+
+            <a href="/farms/new" class="button primary"> + Add Farm </a>
+          </div>
+
+          <!-- Farms -->
+
+          <div th:unless="${#lists.isEmpty(farms)}" class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Farm</th>
+
+                  <th>Type</th>
+
+                  <th>Livestock</th>
+
+                  <th>Compliance</th>
+
+                  <th>Risk</th>
+
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="farm : ${farms}">
+                  <!-- Farm -->
+
+                  <td>
+                    <strong th:text="${farm.name}"> Farm </strong>
+
+                    <small th:text="${farm.location ?: '—'}"> Location </small>
+                  </td>
+
+                  <!-- Type -->
+
+                  <td th:text="${farm.farmType ?: '—'}">Poultry</td>
+
+                  <!-- Livestock -->
+
+                  <td th:text="${farm.livestockCount ?: 0}">0</td>
+
+                  <!-- Compliance -->
+
+                  <td>
+                    <div class="progress">
+                      <span
+                        th:style="'width:' +
+                                  ${farm.compliancePercent ?: 0} +
+                                  '%'"
+                      >
+                      </span>
+                    </div>
+
+                    <b th:text="${(farm.compliancePercent ?: 0) + '%'}"> 0% </b>
+                  </td>
+
+                  <!-- Risk -->
+
+                  <td>
+                    <span
+                      class="badge"
+                      th:classappend="${farm.riskLevel != null
+                                        ? #strings.toLowerCase(farm.riskLevel)
+                                        : 'low'}"
+                      th:text="${farm.riskLevel ?: 'LOW'}"
+                    >
+                      LOW
+                    </span>
+                  </td>
+
+                  <!-- Actions -->
+
+                  <td>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                      <a
+                        th:href="@{/livestock(farmId=${farm.id})}"
+                        class="text-link"
+                      >
+                        Livestock
+                      </a>
+
+                      <a
+                        th:href="@{/veterinary(farmId=${farm.id})}"
+                        class="text-link"
+                      >
+                        Veterinary
+                      </a>
+
+                      <a
+                        th:href="@{/daily-log(farmId=${farm.id})}"
+                        class="text-link"
+                      >
+                        Daily Log
+                      </a>
+
+                      <a
+                        th:href="@{/risk-assessment(farmId=${farm.id})}"
+                        class="text-link"
+                      >
+                        Risk
+                      </a>
+
+                      <a
+                        th:href="@{/compliance-passport(farmId=${farm.id})}"
+                        class="text-link"
+                      >
+                        Passport
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- =======================================================
+             RECENT ALERTS
+             ======================================================= -->
+
+        <section class="content-grid" style="margin-top: 14px">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Recent Alerts</h3>
+
+                <p>Latest biosecurity events</p>
+              </div>
+
+              <a href="/alerts" class="text-link"> View All </a>
+            </div>
+
+            <!-- No alerts -->
+
+            <div th:if="${#lists.isEmpty(recentAlerts)}" class="empty">
+              No alerts recorded.
+            </div>
+
+            <!-- Alerts -->
+
+            <div th:unless="${#lists.isEmpty(recentAlerts)}">
+              <div class="check" th:each="alert : ${recentAlerts}">
+                <div style="flex: 1">
+                  <strong th:text="${alert.title}"> Alert </strong>
+
+                  <small th:text="${alert.farm.name}"> Farm </small>
+                </div>
+
+                <span
+                  class="badge"
+                  th:classappend="${#strings.toLowerCase(alert.severity)}"
+                  th:text="${alert.severity}"
+                >
+                  HIGH
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- =====================================================
+               ALERT SUMMARY
+               ===================================================== -->
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Biosecurity Status</h3>
+
+                <p>Current farm-wide indicators</p>
+              </div>
+            </div>
+
+            <div class="metrics">
+              <div class="metric">
+                <span> Active Alerts </span>
+
+                <strong th:text="${activeAlertCount}"> 0 </strong>
+
+                <small> unresolved </small>
+              </div>
+
+              <div class="metric">
+                <span> High Risk Farms </span>
+
+                <strong th:text="${highRiskCount}"> 0 </strong>
+
+                <small> require review </small>
+              </div>
+            </div>
+
+            <div style="margin-top: 18px">
+              <a href="/alerts" class="button secondary"> View Alerts </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- =======================================================
+             RECENT VETERINARY ACTIVITY
+             ======================================================= -->
+
+        <section class="panel" style="margin-top: 14px">
+          <div class="panel-head">
+            <div>
+              <h3>Recent Veterinary Activity</h3>
+
+              <p>Latest livestock health records</p>
+            </div>
+          </div>
+
+          <!-- No records -->
+
+          <div th:if="${#lists.isEmpty(recentVeterinaryRecords)}" class="empty">
+            No veterinary records have been recorded.
+          </div>
+
+          <!-- Records -->
+
+          <div
+            th:unless="${#lists.isEmpty(recentVeterinaryRecords)}"
+            class="table-wrap"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+
+                  <th>Farm</th>
+
+                  <th>Batch</th>
+
+                  <th>Type</th>
+
+                  <th>Condition</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="record : ${recentVeterinaryRecords}">
+                  <td
+                    th:text="${record.recordDate != null
+                              ? #temporals.format(
+                                  record.recordDate,
+                                  'dd MMM yyyy'
+                                )
+                              : '-'}"
+                  >
+                    -
+                  </td>
+
+                  <td th:text="${record.batch.farm.name}">Farm</td>
+
+                  <td>
+                    <strong th:text="${record.batch.batchCode}"> B001 </strong>
+
+                    <small th:text="${record.batch.species}"> Poultry </small>
+                  </td>
+
+                  <td th:text="${record.recordType}">HEALTH_CHECK</td>
+
+                  <td
+                    th:text="${record.condition != null
+                              && !record.condition.isBlank()
+                              ? record.condition
+                              : '-'}"
+                  >
+                    -
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <!-- =====================================================
+     VISITOR ACTIVITY
+     ===================================================== -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Visitor Activity</h3>
+
+              <p>Current and today's farm visitor activity.</p>
+            </div>
+
+            <a href="/visitors" class="button secondary"> Manage Visitors </a>
+          </div>
+
+          <div class="visitor-stats">
+            <!-- ACTIVE VISITORS -->
+
+            <div class="visitor-stat">
+              <span class="detail-label"> Active Visitors </span>
+
+              <strong th:text="${activeVisitorCount}"> 0 </strong>
+
+              <p>Currently checked in</p>
+            </div>
+
+            <!-- TODAY'S CHECK-INS -->
+
+            <div class="visitor-stat">
+              <span class="detail-label"> Today's Check-ins </span>
+
+              <strong th:text="${todayCheckInCount}"> 0 </strong>
+
+              <p>Visitors entered today</p>
+            </div>
+
+            <!-- TODAY'S CHECK-OUTS -->
+
+            <div class="visitor-stat">
+              <span class="detail-label"> Today's Check-outs </span>
+
+              <strong th:text="${todayCheckOutCount}"> 0 </strong>
+
+              <p>Visitors exited today</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- =======================================================
+             QUICK ACTIONS
+             ======================================================= -->
+
+        <section class="panel" style="margin-top: 14px">
+          <div class="panel-head">
+            <div>
+              <h3>Quick Actions</h3>
+
+              <p>Start by selecting a farm</p>
+            </div>
+          </div>
+
+          <!-- Farms available -->
+
+          <div th:if="${!#lists.isEmpty(farms)}">
+            <p class="muted">
+              Choose a farm from the list above to manage livestock, veterinary
+              records, daily logs, risk assessment and compliance.
+            </p>
+          </div>
+
+          <!-- No farms -->
+
+          <div th:if="${#lists.isEmpty(farms)}" class="top-actions">
+            <a href="/farms/new" class="button primary">
+              + Add Your First Farm
+            </a>
+
+            <a href="/alerts" class="button secondary"> Alerts </a>
+          </div>
+
+          <!-- Global action -->
+
+          <div
+            th:if="${!#lists.isEmpty(farms)}"
+            class="top-actions"
+            style="margin-top: 12px"
+          >
+            <a href="/alerts" class="button secondary"> View Alerts </a>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

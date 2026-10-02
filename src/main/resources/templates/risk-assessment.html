@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>LiveShield · Risk Assessment</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Dashboard -->
+          <a href="/"> Dashboard </a>
+
+          <!-- Livestock -->
+          <a th:href="@{/livestock(farmId=${farm.id})}"> Livestock </a>
+
+          <!-- Veterinary -->
+          <a th:href="@{/veterinary(farmId=${farm.id})}"> Veterinary </a>
+
+          <!-- Daily Log -->
+          <a th:href="@{/daily-log(farmId=${farm.id})}"> Daily Log </a>
+
+          <!-- Risk Assessment -->
+          <a class="active" th:href="@{/risk-assessment(farmId=${farm.id})}">
+            Risk Assessment
+          </a>
+
+          <!-- Alerts -->
+          <a href="/alerts"> Alerts </a>
+
+          <!-- Compliance Passport -->
+          <a th:href="@{/compliance-passport(farmId=${farm.id})}">
+            Compliance Passport
+          </a>
+          <!-- Guides -->
+          <a href="/guides"> Guides </a>
+
+          <a href="/visitors"> Visitors </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow"> FARM RISK </span>
+
+            <h1>Risk Assessment</h1>
+          </div>
+        </header>
+
+        <section class="welcome">
+          <div>
+            <h2 th:text="${farm.name}">Anekal Poultry</h2>
+
+            <p>Assess the current biosecurity controls at this farm.</p>
+          </div>
+
+          <a href="/" class="button secondary"> ← Dashboard </a>
+        </section>
+
+        <section class="content-grid">
+          <div class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h3>Biosecurity assessment</h3>
+
+                <p>Select the condition that best describes the farm.</p>
+              </div>
+            </div>
+
+            <form method="post" action="/risk-assessment">
+              <input type="hidden" name="farmId" th:value="${farm.id}" />
+
+              <!-- PERIMETER -->
+
+              <div class="assessment-question">
+                <label> 1. Perimeter and farm access </label>
+
+                <select name="perimeterControl" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.perimeterControl == 'YES'}"
+                  >
+                    Adequately controlled
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.perimeterControl == 'PARTIAL'}"
+                  >
+                    Partially controlled
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.perimeterControl == 'NO'}"
+                  >
+                    Not adequately controlled
+                  </option>
+                </select>
+              </div>
+
+              <!-- VISITORS -->
+
+              <div class="assessment-question">
+                <label> 2. Visitor control </label>
+
+                <select name="visitorControl" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.visitorControl == 'YES'}"
+                  >
+                    Visitor access is controlled
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.visitorControl == 'PARTIAL'}"
+                  >
+                    Partially controlled
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.visitorControl == 'NO'}"
+                  >
+                    Visitor access is not controlled
+                  </option>
+                </select>
+              </div>
+
+              <!-- CLEANING -->
+
+              <div class="assessment-question">
+                <label> 3. Cleaning and disinfection </label>
+
+                <select name="cleaningDisinfection" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.cleaningDisinfection == 'YES'}"
+                  >
+                    Regularly performed
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.cleaningDisinfection == 'PARTIAL'}"
+                  >
+                    Partially performed
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.cleaningDisinfection == 'NO'}"
+                  >
+                    Not performed adequately
+                  </option>
+                </select>
+              </div>
+
+              <!-- EQUIPMENT -->
+
+              <div class="assessment-question">
+                <label> 4. Equipment hygiene </label>
+
+                <select name="equipmentHygiene" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.equipmentHygiene == 'YES'}"
+                  >
+                    Equipment is cleaned
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.equipmentHygiene == 'PARTIAL'}"
+                  >
+                    Partially maintained
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.equipmentHygiene == 'NO'}"
+                  >
+                    Poorly maintained
+                  </option>
+                </select>
+              </div>
+
+              <!-- ANIMAL HEALTH -->
+
+              <div class="assessment-question">
+                <label> 5. Animal health monitoring </label>
+
+                <select name="animalHealthMonitoring" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.animalHealthMonitoring == 'YES'}"
+                  >
+                    Regular monitoring
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.animalHealthMonitoring == 'PARTIAL'}"
+                  >
+                    Inconsistent monitoring
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.animalHealthMonitoring == 'NO'}"
+                  >
+                    No regular monitoring
+                  </option>
+                </select>
+              </div>
+
+              <!-- ISOLATION -->
+
+              <div class="assessment-question">
+                <label> 6. Sick animal isolation </label>
+
+                <select name="sickAnimalIsolation" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.sickAnimalIsolation == 'YES'}"
+                  >
+                    Sick animals are isolated
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.sickAnimalIsolation == 'PARTIAL'}"
+                  >
+                    Isolation is inconsistent
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.sickAnimalIsolation == 'NO'}"
+                  >
+                    No isolation procedure
+                  </option>
+                </select>
+              </div>
+
+              <!-- FEED -->
+
+              <div class="assessment-question">
+                <label> 7. Feed storage </label>
+
+                <select name="feedStorage" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.feedStorage == 'YES'}"
+                  >
+                    Properly protected
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.feedStorage == 'PARTIAL'}"
+                  >
+                    Partially protected
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.feedStorage == 'NO'}"
+                  >
+                    Not adequately protected
+                  </option>
+                </select>
+              </div>
+
+              <!-- WATER -->
+
+              <div class="assessment-question">
+                <label> 8. Water safety </label>
+
+                <select name="waterSafety" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.waterSafety == 'YES'}"
+                  >
+                    Water source is protected
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.waterSafety == 'PARTIAL'}"
+                  >
+                    Partially protected
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.waterSafety == 'NO'}"
+                  >
+                    Not adequately protected
+                  </option>
+                </select>
+              </div>
+
+              <!-- WASTE -->
+
+              <div class="assessment-question">
+                <label> 9. Waste management </label>
+
+                <select name="wasteManagement" required>
+                  <option value="">Select condition</option>
+
+                  <option
+                    value="YES"
+                    th:selected="${assessment.wasteManagement == 'YES'}"
+                  >
+                    Proper waste management
+                  </option>
+
+                  <option
+                    value="PARTIAL"
+                    th:selected="${assessment.wasteManagement == 'PARTIAL'}"
+                  >
+                    Partially managed
+                  </option>
+
+                  <option
+                    value="NO"
+                    th:selected="${assessment.wasteManagement == 'NO'}"
+                  >
+                    Poor waste management
+                  </option>
+                </select>
+              </div>
+
+              <button type="submit" class="button primary">
+                Calculate risk
+              </button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Current assessment</h3>
+
+                <p>Latest calculated result</p>
+              </div>
+            </div>
+
+            <div class="metric">
+              <span>Risk score</span>
+
+              <strong th:text="${assessment.riskScore + '%'}"> 0% </strong>
+
+              <small> Higher score = higher risk </small>
+            </div>
+
+            <div style="margin-top: 24px">
+              <span>Risk level</span>
+
+              <div style="margin-top: 8px">
+                <span
+                  class="badge"
+                  th:classappend="${#strings.toLowerCase(assessment.riskLevel)}"
+                  th:text="${assessment.riskLevel}"
+                >
+                  LOW
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="panel" style="margin-top: 24px">
+          <div class="panel-head">
+            <div>
+              <h3>Priority actions</h3>
+
+              <p>Actions generated from the current assessment.</p>
+            </div>
+          </div>
+
+          <div th:if="${#lists.isEmpty(priorityActions)}" class="empty">
+            No priority actions. All assessed controls are currently marked as
+            adequately maintained.
+          </div>
+
+          <div th:unless="${#lists.isEmpty(priorityActions)}">
+            <div
+              th:each="action : ${priorityActions}"
+              style="padding: 16px 0; border-bottom: 1px solid #e5e9e6"
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-start;
+                  gap: 20px;
+                "
+              >
+                <div>
+                  <strong th:text="${action.title}">
+                    Improve perimeter and access control
+                  </strong>
+
+                  <p style="margin: 6px 0 0" th:text="${action.description}">
+                    Strengthen farm boundaries and control entry into the farm.
+                  </p>
+                </div>
+
+                <span
+                  class="badge"
+                  th:classappend="${#strings.toLowerCase(action.priority)}"
+                  th:text="${action.priority}"
+                >
+                  HIGH
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

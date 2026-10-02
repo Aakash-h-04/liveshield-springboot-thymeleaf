@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Veterinary Record | LiveShield</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="form-page">
+      <div class="form-card">
+        <a th:href="@{/veterinary(farmId=${farm.id})}" class="back">
+          ← Back to Veterinary
+        </a>
+
+        <h1>Add Veterinary Record</h1>
+
+        <p class="muted" th:text="${farm.name}">Farm</p>
+
+        <!-- No batches -->
+
+        <div th:if="${#lists.isEmpty(batches)}" class="empty">
+          <p>No livestock batches are available.</p>
+
+          <a th:href="@{/livestock(farmId=${farm.id})}" class="button primary">
+            Add Livestock Batch
+          </a>
+        </div>
+
+        <!-- Record Form -->
+
+        <form
+          th:unless="${#lists.isEmpty(batches)}"
+          th:object="${record}"
+          th:action="@{/veterinary}"
+          method="post"
+        >
+          <input type="hidden" name="farmId" th:value="${farm.id}" />
+
+          <!-- Batch -->
+
+          <div>
+            <label>
+              Livestock Batch
+
+              <select name="batchId" required>
+                <option value="">Select batch</option>
+
+                <option
+                  th:each="batch : ${batches}"
+                  th:value="${batch.id}"
+                  th:text="${batch.batchCode + ' — ' +
+                                     batch.species + ' (' +
+                                     batch.animalCount + ' animals)'}"
+                ></option>
+              </select>
+            </label>
+          </div>
+
+          <!-- Date -->
+
+          <div>
+            <label>
+              Record Date
+
+              <input
+                type="date"
+                name="recordDate"
+                th:value="${record.recordDate}"
+                required
+              />
+            </label>
+          </div>
+
+          <!-- Record Type -->
+
+          <div>
+            <label>
+              Record Type
+
+              <select name="recordType" required>
+                <option value="">Select record type</option>
+
+                <option value="HEALTH_CHECK">Health Check</option>
+
+                <option value="VACCINATION">Vaccination</option>
+
+                <option value="TREATMENT">Treatment</option>
+
+                <option value="DISEASE">Disease / Condition</option>
+
+                <option value="VETERINARY_VISIT">Veterinary Visit</option>
+              </select>
+
+              <small
+                class="form-error"
+                th:if="${#fields.hasErrors('recordType')}"
+                th:errors="*{recordType}"
+              ></small>
+            </label>
+          </div>
+
+          <!-- Condition -->
+
+          <div>
+            <label>
+              Condition
+
+              <input
+                type="text"
+                name="condition"
+                placeholder="Example: No abnormal signs"
+              />
+            </label>
+          </div>
+
+          <!-- Treatment -->
+
+          <div>
+            <label>
+              Treatment
+
+              <input
+                type="text"
+                name="treatment"
+                placeholder="Example: Antibiotic / vaccination"
+              />
+            </label>
+          </div>
+
+          <!-- Veterinarian -->
+
+          <div>
+            <label>
+              Veterinarian
+
+              <input
+                type="text"
+                name="veterinarian"
+                placeholder="Veterinarian name"
+              />
+            </label>
+          </div>
+
+          <!-- Notes -->
+
+          <div>
+            <label>
+              Notes
+
+              <textarea
+                name="notes"
+                rows="4"
+                placeholder="Additional observations or instructions"
+                style="
+                  display: block;
+                  width: 100%;
+                  margin-top: 7px;
+                  border: 1px solid #cfd8d1;
+                  border-radius: 5px;
+                  padding: 11px;
+                  font: inherit;
+                  resize: vertical;
+                "
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <a
+              th:href="@{/veterinary(farmId=${farm.id})}"
+              class="button secondary"
+            >
+              Cancel
+            </a>
+
+            <button type="submit" class="button primary">Save Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

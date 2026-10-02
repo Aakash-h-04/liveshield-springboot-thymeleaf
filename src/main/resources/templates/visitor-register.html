@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LiveShield · Register Visitor</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+
+        <nav>
+          <a href="/">Dashboard</a>
+
+          <a href="/visitors" class="active"> Visitors </a>
+
+          <a href="/guides"> Guides </a>
+
+          <a href="/alerts"> Alerts </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow"> VISITOR MANAGEMENT </span>
+
+            <h1>Register Visitor</h1>
+          </div>
+        </header>
+
+        <section class="welcome">
+          <div>
+            <h2>Create a verified visitor identity</h2>
+
+            <p>
+              Register the visitor once. Their LiveShield identity can then be
+              used for future farm visits.
+            </p>
+          </div>
+
+          <a href="/visitors" class="button secondary"> ← Visitors </a>
+        </section>
+
+        <!-- ERROR -->
+        <div th:if="${error}" class="form-error" th:text="${error}">Error</div>
+
+        <form method="post" action="/visitors/register" class="form-card">
+          <!-- BASIC INFORMATION -->
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Visitor information</h3>
+
+                <p>Basic information used to identify the visitor.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <label>
+                Full name
+
+                <input
+                  type="text"
+                  name="fullName"
+                  th:value="${visitor.fullName}"
+                  placeholder="Enter full name"
+                  required
+                />
+              </label>
+
+              <label>
+                Mobile number
+
+                <input
+                  type="tel"
+                  name="mobile"
+                  th:value="${visitor.mobile}"
+                  placeholder="Enter mobile number"
+                  required
+                />
+              </label>
+
+              <label>
+                Email
+
+                <input
+                  type="email"
+                  name="email"
+                  th:value="${visitor.email}"
+                  placeholder="Optional"
+                />
+              </label>
+
+              <label>
+                Company / organization
+
+                <input
+                  type="text"
+                  name="companyName"
+                  th:value="${visitor.companyName}"
+                  placeholder="Vendor / distributor / organization"
+                />
+              </label>
+
+              <label>
+                Visitor type
+
+                <select name="visitorType" required>
+                  <option value="">Select type</option>
+
+                  <option value="VENDOR">Vendor</option>
+
+                  <option value="DISTRIBUTOR">Distributor</option>
+
+                  <option value="VETERINARIAN">Veterinarian</option>
+
+                  <option value="TECHNICIAN">
+                    Technician / Service Provider
+                  </option>
+
+                  <option value="TRANSPORTER">
+                    Livestock / Feed Transporter
+                  </option>
+
+                  <option value="INSPECTOR">Inspector / Official</option>
+
+                  <option value="OTHER">Other</option>
+                </select>
+              </label>
+
+              <label>
+                Address
+
+                <input
+                  type="text"
+                  name="address"
+                  th:value="${visitor.address}"
+                  placeholder="City / district"
+                />
+              </label>
+            </div>
+          </section>
+
+          <!-- ID -->
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Identity verification</h3>
+
+                <p>Record the identity reference used during verification.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <label>
+                ID type
+
+                <select name="idType">
+                  <option value="">Select ID type</option>
+
+                  <option value="GOVERNMENT_ID">Government ID</option>
+
+                  <option value="BUSINESS_ID">Business ID</option>
+
+                  <option value="LICENSE">Licence</option>
+
+                  <option value="OTHER">Other</option>
+                </select>
+              </label>
+
+              <label>
+                ID reference
+
+                <input
+                  type="text"
+                  name="idReference"
+                  th:value="${visitor.idReference}"
+                  placeholder="Reference number"
+                />
+              </label>
+            </div>
+          </section>
+
+          <!-- LICENCE -->
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Professional licence</h3>
+
+                <p>
+                  Required for vendors, distributors and other regulated
+                  farm-service visitors.
+                </p>
+              </div>
+
+              <span class="status-badge"> Verification required </span>
+            </div>
+
+            <div class="form-grid">
+              <label>
+                Licence number
+
+                <input
+                  type="text"
+                  name="licenceNumber"
+                  th:value="${licence.licenceNumber}"
+                  placeholder="Licence number"
+                  required
+                />
+              </label>
+
+              <label>
+                Licence type
+
+                <select name="licenceType" required>
+                  <option value="">Select licence type</option>
+
+                  <option value="FEED_DISTRIBUTOR">Feed Distributor</option>
+
+                  <option value="VETERINARY">Veterinary</option>
+
+                  <option value="LIVESTOCK_TRANSPORT">
+                    Livestock Transport
+                  </option>
+
+                  <option value="EQUIPMENT_VENDOR">Equipment Vendor</option>
+
+                  <option value="OTHER">Other</option>
+                </select>
+              </label>
+
+              <label>
+                Issuing authority
+
+                <input
+                  type="text"
+                  name="issuingAuthority"
+                  th:value="${licence.issuingAuthority}"
+                  placeholder="Issuing authority"
+                />
+              </label>
+
+              <label>
+                Issue date
+
+                <input
+                  type="date"
+                  name="issueDate"
+                  th:value="${licence.issueDate}"
+                />
+              </label>
+
+              <label>
+                Expiry date
+
+                <input
+                  type="date"
+                  name="expiryDate"
+                  th:value="${licence.expiryDate}"
+                  required
+                />
+              </label>
+            </div>
+          </section>
+
+          <!-- ACTIONS -->
+          <div class="form-actions">
+            <a href="/visitors" class="button secondary"> Cancel </a>
+
+            <button type="submit" class="button primary">
+              Register Visitor
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </body>
+</html>

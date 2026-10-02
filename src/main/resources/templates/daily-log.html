@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LiveShield · Daily Log</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Dashboard -->
+          <a href="/"> Dashboard </a>
+
+          <!-- Livestock -->
+          <a th:href="@{/livestock(farmId=${farm.id})}"> Livestock </a>
+
+          <!-- Veterinary -->
+          <a th:href="@{/veterinary(farmId=${farm.id})}"> Veterinary </a>
+
+          <!-- Daily Log -->
+          <a class="active" th:href="@{/daily-log(farmId=${farm.id})}">
+            Daily Log
+          </a>
+
+          <!-- Risk Assessment -->
+          <a th:href="@{/risk-assessment(farmId=${farm.id})}">
+            Risk Assessment
+          </a>
+
+          <!-- Alerts -->
+          <a href="/alerts"> Alerts </a>
+
+          <!-- Compliance Passport -->
+          <a th:href="@{/compliance-passport(farmId=${farm.id})}">
+            Compliance Passport
+          </a>
+          <!-- Guides -->
+          <a href="/guides"> Guides </a>
+
+          <a href="/visitors"> Visitors </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow">DAILY BIOSECURITY</span>
+            <h1>Daily Log</h1>
+          </div>
+        </header>
+
+        <section class="welcome">
+          <div>
+            <h2 th:text="${farm.name}">Anekal Poultry</h2>
+
+            <p>Complete today's biosecurity checklist.</p>
+          </div>
+
+          <a href="/" class="button secondary"> ← Dashboard </a>
+        </section>
+
+        <section class="content-grid">
+          <div class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h3>Today's biosecurity checks</h3>
+
+                <p th:text="${log.logDate}">2026-09-30</p>
+              </div>
+            </div>
+
+            <form method="post" action="/daily-log">
+              <input type="hidden" name="farmId" th:value="${farm.id}" />
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="footbathChecked"
+                  th:checked="${log.footbathChecked}"
+                />
+                <span>Entrance footbath checked and maintained</span>
+              </label>
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="equipmentCleaned"
+                  th:checked="${log.equipmentCleaned}"
+                />
+                <span>Shared equipment cleaned and disinfected</span>
+              </label>
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="visitorRecordsVerified"
+                  th:checked="${log.visitorRecordsVerified}"
+                />
+                <span>Visitor records verified</span>
+              </label>
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="waterSourceChecked"
+                  th:checked="${log.waterSourceChecked}"
+                />
+                <span>Water source checked</span>
+              </label>
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="feedStorageChecked"
+                  th:checked="${log.feedStorageChecked}"
+                />
+                <span>Feed storage checked and protected</span>
+              </label>
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="wasteDisposedProperly"
+                  th:checked="${log.wasteDisposedProperly}"
+                />
+                <span>Farm waste disposed of properly</span>
+              </label>
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="sickAnimalsSeparated"
+                  th:checked="${log.sickAnimalsSeparated}"
+                />
+                <span>Sick animals separated from healthy stock</span>
+              </label>
+
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="protectiveEquipmentUsed"
+                  th:checked="${log.protectiveEquipmentUsed}"
+                />
+                <span>Protective equipment used correctly</span>
+              </label>
+
+              <button type="submit" class="button primary">
+                Save today's log
+              </button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>How compliance works</h3>
+
+                <p>Based on completed daily checks.</p>
+              </div>
+            </div>
+
+            <div class="metric">
+              <span>Current compliance</span>
+
+              <strong th:text="${log.compliancePercent + '%'}"> 0% </strong>
+
+              <small> 8 checks today </small>
+            </div>
+
+            <div style="margin-top: 20px">
+              <p>
+                <strong>Risk levels</strong>
+              </p>
+
+              <p>Below 40% — High</p>
+
+              <p>40–70% — Medium</p>
+
+              <p>Above 70% — Low</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

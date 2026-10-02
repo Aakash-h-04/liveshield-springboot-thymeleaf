@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Livestock Batch | LiveShield</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="form-page">
+      <div class="form-card">
+        <a th:href="@{/livestock(farmId=${farm.id})}" class="back">
+          ← Back to Livestock
+        </a>
+
+        <h1
+          th:text="${batch.id == null
+                ? 'Add Livestock Batch'
+                : 'Edit Livestock Batch'}"
+        >
+          Add Livestock Batch
+        </h1>
+
+        <p class="muted" th:text="${farm.name}">Farm</p>
+
+        <form
+          th:object="${batch}"
+          th:action="${batch.id == null
+        ? '/livestock'
+        : '/livestock/' + batch.id}"
+          method="post"
+        >
+          <input type="hidden" name="farmId" th:value="${farm.id}" />
+
+          <div>
+            <label>
+              Batch Code
+
+              <input
+                type="text"
+                name="batchCode"
+                placeholder="Example: B001"
+                th:value="${batch.batchCode}"
+                required
+              />
+
+              <small
+                class="form-error"
+                th:if="${#fields.hasErrors('batchCode')}"
+                th:errors="*{batchCode}"
+              >
+              </small>
+            </label>
+          </div>
+
+          <div>
+            <label>
+              Species
+
+              <select name="species" required>
+                <option value="">Select species</option>
+
+                <option
+                  value="Poultry"
+                  th:selected="${batch.species == 'Poultry'}"
+                >
+                  Poultry
+                </option>
+
+                <option value="Pig" th:selected="${batch.species == 'Pig'}">
+                  Pig
+                </option>
+              </select>
+
+              <small
+                class="form-error"
+                th:if="${#fields.hasErrors('species')}"
+                th:errors="*{species}"
+              >
+              </small>
+            </label>
+          </div>
+
+          <div>
+            <label>
+              Breed
+
+              <input
+                type="text"
+                name="breed"
+                placeholder="Example: Large White"
+                th:value="${batch.breed}"
+              />
+            </label>
+          </div>
+
+          <div>
+            <label>
+              Animal Count
+
+              <input
+                type="number"
+                name="animalCount"
+                min="0"
+                th:value="${batch.animalCount}"
+                required
+              />
+              <small
+                class="form-error"
+                th:if="${#fields.hasErrors('animalCount')}"
+                th:errors="*{animalCount}"
+              >
+              </small>
+            </label>
+          </div>
+
+          <div>
+            <label>
+              Arrival Date
+
+              <input
+                type="date"
+                name="arrivalDate"
+                th:value="${batch.arrivalDate}"
+              />
+            </label>
+          </div>
+
+          <div>
+            <label>
+              Source
+
+              <input
+                type="text"
+                name="source"
+                placeholder="Farm / supplier / hatchery"
+                th:value="${batch.source}"
+              />
+            </label>
+          </div>
+
+          <div>
+            <label>
+              Health Status
+
+              <select name="healthStatus">
+                <option
+                  value="HEALTHY"
+                  th:selected="${batch.healthStatus == 'HEALTHY'}"
+                >
+                  Healthy
+                </option>
+
+                <option
+                  value="MONITOR"
+                  th:selected="${batch.healthStatus == 'MONITOR'}"
+                >
+                  Monitor
+                </option>
+
+                <option
+                  value="SICK"
+                  th:selected="${batch.healthStatus == 'SICK'}"
+                >
+                  Sick
+                </option>
+
+                <option
+                  value="ISOLATED"
+                  th:selected="${batch.healthStatus == 'ISOLATED'}"
+                >
+                  Isolated
+                </option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <a
+              th:href="@{/livestock(farmId=${farm.id})}"
+              class="button secondary"
+            >
+              Cancel
+            </a>
+
+            <button type="submit" class="button primary">Save Batch</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Farm Check-in Successful | LiveShield</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}" />
+  </head>
+
+  <body>
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <h2>LiveShield</h2>
+          <span>BioSecurity Companion</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="/">Dashboard</a>
+          <a href="/livestock">Livestock</a>
+          <a href="/veterinary">Veterinary</a>
+          <a href="/daily-log">Daily Log</a>
+          <a href="/risk-assessment">Risk Assessment</a>
+          <a href="/alerts">Alerts</a>
+
+          <a href="/compliance-passport"> Compliance Passport </a>
+
+          <a href="/guides">Guides</a>
+
+          <a href="/visitors" class="active"> Visitors </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1>Farm Check-in Successful</h1>
+
+            <p>The visitor has been cleared and checked in.</p>
+          </div>
+
+          <a href="/visitors" class="btn btn-secondary"> Visitors </a>
+        </div>
+
+        <!-- SUCCESS -->
+        <section class="card">
+          <div class="verification-result">
+            <div class="verification-status">ENTRY ALLOWED</div>
+
+            <h2>Visitor successfully checked in</h2>
+
+            <p>A farm-specific e-pass has been issued for this visit.</p>
+          </div>
+        </section>
+
+        <!-- VISITOR DETAILS -->
+        <section class="card">
+          <h2>Visitor Details</h2>
+
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label"> Visitor </span>
+
+              <strong th:text="${visit.visitor.fullName}">
+                Visitor Name
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Visitor ID </span>
+
+              <strong th:text="${visit.visitor.visitorCode}"> VST-XXXX </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Company </span>
+
+              <strong
+                th:text="${visit.visitor.companyName != null
+                            ? visit.visitor.companyName
+                            : '—'}"
+              >
+                —
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Purpose </span>
+
+              <strong th:text="${visit.purpose}"> Delivery </strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- FARM DETAILS -->
+        <section class="card">
+          <h2>Farm Visit</h2>
+
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label"> Destination Farm </span>
+
+              <strong th:text="${visit.farm.name}"> Farm Name </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Location </span>
+
+              <strong
+                th:text="${visit.farm.location != null
+                            ? visit.farm.location
+                            : '—'}"
+              >
+                —
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Check-in Time </span>
+
+              <strong
+                th:text="${#temporals.format(
+                            visit.checkInTime,
+                            'dd MMM yyyy, hh:mm a'
+                        )}"
+              >
+                —
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Vehicle </span>
+
+              <strong
+                th:text="${visit.vehicleNumber != null
+                            ? visit.vehicleNumber
+                            : '—'}"
+              >
+                —
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- E-PASS -->
+        <section class="card">
+          <h2>Farm E-Pass</h2>
+
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label"> Pass Code </span>
+
+              <strong th:text="${visit.passCode}"> PASS-XXXX-XXXX-XXXX </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Status </span>
+
+              <span class="badge verified"> ACTIVE </span>
+            </div>
+
+            <div>
+              <span class="detail-label"> Issued At </span>
+
+              <strong
+                th:text="${#temporals.format(
+                            visit.passIssuedAt,
+                            'dd MMM yyyy, hh:mm a'
+                        )}"
+              >
+                —
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Valid Until </span>
+
+              <strong
+                th:text="${#temporals.format(
+                            visit.passValidUntil,
+                            'dd MMM yyyy, hh:mm a'
+                        )}"
+              >
+                —
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        <div class="page-actions">
+          <a
+            th:href="@{'/visitors/'
+                    + ${visit.visitor.visitorCode}}"
+            class="btn btn-secondary"
+          >
+            View Visitor Profile
+          </a>
+
+          <a href="/visitors" class="btn btn-primary"> Back to Visitors </a>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

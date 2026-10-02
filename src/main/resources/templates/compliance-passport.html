@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Compliance Passport | LiveShield</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- SIDEBAR -->
+
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LS</div>
+
+          <div>
+            <strong>LiveShield</strong>
+            <small>Biosecurity Portal</small>
+          </div>
+        </div>
+
+        <nav>
+          <!-- Dashboard -->
+          <a href="/"> Dashboard </a>
+
+          <!-- Livestock -->
+          <a th:href="@{/livestock(farmId=${passport.farm.id})}"> Livestock </a>
+
+          <!-- Veterinary -->
+          <a th:href="@{/veterinary(farmId=${passport.farm.id})}">
+            Veterinary
+          </a>
+
+          <!-- Daily Log -->
+          <a th:href="@{/daily-log(farmId=${passport.farm.id})}"> Daily Log </a>
+
+          <!-- Risk Assessment -->
+          <a th:href="@{/risk-assessment(farmId=${passport.farm.id})}">
+            Risk Assessment
+          </a>
+
+          <!-- Alerts -->
+          <a href="/alerts"> Alerts </a>
+
+          <!-- Compliance Passport -->
+          <a
+            class="active"
+            th:href="@{/compliance-passport(farmId=${passport.farm.id})}"
+          >
+            Compliance Passport
+          </a>
+          <!-- Guides -->
+          <a href="/guides"> Guides </a>
+
+          <a href="/visitors"> Visitors </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a href="/farms/new"> + Add Farm </a>
+        </div>
+      </aside>
+      <!-- MAIN -->
+
+      <main class="main">
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">FARM COMPLIANCE</div>
+
+            <h1>Compliance Passport</h1>
+          </div>
+
+          <div class="top-actions">
+            <div class="avatar">LS</div>
+          </div>
+        </header>
+
+        <!-- WELCOME -->
+
+        <section class="welcome">
+          <div>
+            <h2 th:text="${passport.farm.name}">Farm</h2>
+
+            <p>Biosecurity compliance and risk status</p>
+          </div>
+        </section>
+
+        <!-- FARM INFORMATION -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Farm Information</h3>
+
+              <p>Basic farm details</p>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <span>Farm Name</span>
+
+              <strong th:text="${passport.farm.name}"> - </strong>
+            </div>
+
+            <div class="metric">
+              <span>Owner</span>
+
+              <strong th:text="${passport.farm.ownerName}"> - </strong>
+            </div>
+
+            <div class="metric">
+              <span>Farm Type</span>
+
+              <strong th:text="${passport.farm.farmType}"> - </strong>
+            </div>
+
+            <div class="metric">
+              <span>Livestock</span>
+
+              <strong th:text="${passport.farm.livestockCount}"> 0 </strong>
+
+              <small> animals </small>
+            </div>
+          </div>
+
+          <div style="margin-top: 12px">
+            <span class="muted"> Location: </span>
+
+            <strong th:text="${passport.farm.location}"> - </strong>
+          </div>
+        </section>
+
+        <!-- CURRENT STATUS -->
+
+        <section class="content-grid">
+          <!-- COMPLIANCE -->
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Current Compliance</h3>
+
+                <p>Based on the latest daily biosecurity log</p>
+              </div>
+            </div>
+
+            <div class="metric">
+              <span> Compliance Score </span>
+
+              <strong th:text="${passport.farm.compliancePercent + '%'}">
+                0%%
+              </strong>
+
+              <div class="progress">
+                <span
+                  th:style="'width:' +
+                            ${passport.farm.compliancePercent} +
+                            '%'"
+                >
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RISK -->
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Risk Status</h3>
+
+                <p>Current farm risk level</p>
+              </div>
+            </div>
+
+            <div>
+              <span
+                class="badge"
+                th:classappend="${#strings.toLowerCase(
+                            passport.farm.riskLevel
+                        )}"
+                th:text="${passport.farm.riskLevel}"
+              >
+                MEDIUM
+              </span>
+            </div>
+
+            <p style="margin-top: 14px" th:text="${passport.passportStatus}">
+              UNDER REVIEW
+            </p>
+          </div>
+        </section>
+
+        <!-- LATEST RISK ASSESSMENT -->
+
+        <section class="panel" style="margin-top: 14px">
+          <div class="panel-head">
+            <div>
+              <h3>Latest Risk Assessment</h3>
+
+              <p>Most recent biosecurity risk evaluation</p>
+            </div>
+
+            <a
+              th:href="@{/risk-assessment(
+                        farmId=${passport.farm.id}
+                    )}"
+              class="text-link"
+            >
+              Reassess
+            </a>
+          </div>
+
+          <div th:if="${passport.assessment.id != null}" class="metrics">
+            <div class="metric">
+              <span> Risk Score </span>
+
+              <strong th:text="${passport.assessment.riskScore + '/' + '100'}">
+                0 / 100
+              </strong>
+            </div>
+
+            <div class="metric">
+              <span> Risk Level </span>
+
+              <strong th:text="${passport.assessment.riskLevel}"> - </strong>
+            </div>
+
+            <div class="metric">
+              <span> Assessed </span>
+
+              <strong
+                th:text="${#temporals.format(
+                            passport.assessment.assessedAt,
+                            'dd MMM yyyy'
+                        )}"
+              >
+                -
+              </strong>
+            </div>
+
+            <div class="metric">
+              <span> Time </span>
+
+              <strong
+                th:text="${#temporals.format(
+                            passport.assessment.assessedAt,
+                            'HH:mm'
+                        )}"
+              >
+                -
+              </strong>
+            </div>
+          </div>
+
+          <div th:unless="${passport.assessment.id != null}" class="empty">
+            No risk assessment has been completed yet.
+          </div>
+        </section>
+
+        <!-- ACTIONS -->
+
+        <section class="panel" style="margin-top: 14px">
+          <div class="panel-head">
+            <div>
+              <h3>Quick Actions</h3>
+
+              <p>Continue managing this farm</p>
+            </div>
+          </div>
+
+          <div class="top-actions">
+            <a
+              th:href="@{/risk-assessment(
+                        farmId=${passport.farm.id}
+                    )}"
+              class="button primary"
+            >
+              Risk Assessment
+            </a>
+
+            <a
+              th:href="@{/daily-log(
+                        farmId=${passport.farm.id}
+                    )}"
+              class="button secondary"
+            >
+              Daily Log
+            </a>
+
+            <a href="/alerts" class="button secondary"> View Alerts </a>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>LiveShield · Guide</title>
+
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- SIDEBAR -->
+
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark"> L </span>
+
+          <div>
+            <strong> LiveShield </strong>
+
+            <small> Farm Biosecurity </small>
+          </div>
+        </div>
+
+        <nav>
+          <a href="/"> Dashboard </a>
+
+          <a href="/livestock?farmId=1"> Livestock </a>
+
+          <a href="/veterinary?farmId=1"> Veterinary </a>
+
+          <a href="/daily-log?farmId=1"> Daily Log </a>
+
+          <a href="/risk-assessment?farmId=1"> Risk Assessment </a>
+
+          <a href="/alerts"> Alerts </a>
+
+          <a href="/compliance-passport?farmId=1"> Compliance Passport </a>
+
+          <a class="active" th:href="@{/guides(lang=${selectedLanguage})}">
+            Guides
+          </a>
+
+          <div class="sidebar-separator"></div>
+
+          <a href="/farms/new"> + Add Farm </a>
+        </nav>
+      </aside>
+
+      <!-- MAIN -->
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow"> BIOSECURITY LEARNING </span>
+
+            <h1>Guide</h1>
+          </div>
+        </header>
+
+        <!-- GUIDE HEADER -->
+
+        <section class="welcome">
+          <div>
+            <a th:href="@{/guides(lang=${selectedLanguage})}" class="back">
+              ← Back to Guides
+            </a>
+
+            <h2 th:text="${guide.title}">Entry Control</h2>
+
+            <p th:text="${guide.description}">Guide description</p>
+          </div>
+        </section>
+
+        <!-- LANGUAGE -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Language</h3>
+
+              <p>View this guide in your preferred language.</p>
+            </div>
+
+            <select
+              onchange="changeLanguage(this.value)"
+              aria-label="Select guide language"
+            >
+              <option value="en" th:selected="${selectedLanguage == 'en'}">
+                English
+              </option>
+
+              <option value="hi" th:selected="${selectedLanguage == 'hi'}">
+                Hindi
+              </option>
+
+              <option value="ta" th:selected="${selectedLanguage == 'ta'}">
+                Tamil
+              </option>
+
+              <option value="te" th:selected="${selectedLanguage == 'te'}">
+                Telugu
+              </option>
+
+              <option value="bn" th:selected="${selectedLanguage == 'bn'}">
+                Bengali
+              </option>
+
+              <option value="kn" th:selected="${selectedLanguage == 'kn'}">
+                Kannada
+              </option>
+
+              <option value="gu" th:selected="${selectedLanguage == 'gu'}">
+                Gujarati
+              </option>
+
+              <option value="mr" th:selected="${selectedLanguage == 'mr'}">
+                Marathi
+              </option>
+
+              <option value="pa" th:selected="${selectedLanguage == 'pa'}">
+                Punjabi
+              </option>
+            </select>
+          </div>
+        </section>
+
+        <!-- VISUAL GUIDE -->
+
+        
+
+        <!-- DETAILED STEPS -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Step-by-step procedure</h3>
+
+              <p>Follow these instructions during daily farm operations.</p>
+            </div>
+          </div>
+
+          <ol class="guide-steps">
+            <li th:each="step : ${guide.steps}" th:text="${step}">Step</li>
+          </ol>
+        </section>
+
+        <!-- ACTION -->
+
+        <div class="form-actions">
+          <a
+            th:href="@{/guides(lang=${selectedLanguage})}"
+            class="button secondary"
+          >
+            ← All Guides
+          </a>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      function changeLanguage(language) {
+        const url = new URL(window.location.href);
+
+        url.searchParams.set("lang", language);
+
+        window.location.href = url.toString();
+      }
+    </script>
+  </body>
+</html>

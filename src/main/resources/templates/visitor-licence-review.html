@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Licence Review | LiveShield</title>
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <h2>LiveShield</h2>
+          <span>Biosecurity Companion</span>
+        </div>
+
+        <nav>
+          <a href="/">Dashboard</a>
+          <a href="/livestock">Livestock</a>
+          <a href="/veterinary">Veterinary</a>
+          <a href="/daily-log">Daily Log</a>
+          <a href="/risk-assessment">Risk Assessment</a>
+          <a href="/alerts">Alerts</a>
+          <a href="/compliance-passport"> Compliance Passport </a>
+          <a href="/guides">Guides</a>
+          <a href="/visitors" class="active">Visitors</a>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1>Licence Verification</h1>
+            <p>
+              Review the visitor's professional licence before granting farm
+              access.
+            </p>
+          </div>
+        </div>
+
+        <section class="card">
+          <h2>Licence Details</h2>
+
+          <div class="detail-grid">
+            <div>
+              <span class="detail-label"> Visitor </span>
+
+              <strong th:text="${licence.visitor.fullName}">
+                Visitor Name
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Visitor ID </span>
+
+              <strong th:text="${licence.visitor.visitorCode}">
+                VST-XXXX
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Licence Number </span>
+
+              <strong th:text="${licence.licenceNumber}"> LIC-001 </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Licence Type </span>
+
+              <strong th:text="${licence.licenceType}">
+                FEED_DISTRIBUTOR
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Issuing Authority </span>
+
+              <strong th:text="${licence.issuingAuthority ?: 'Not provided'}">
+                Authority
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Issue Date </span>
+
+              <strong th:text="${licence.issueDate ?: 'Not provided'}">
+                2026-01-01
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Expiry Date </span>
+
+              <strong th:text="${licence.expiryDate ?: 'Not provided'}">
+                2030-10-01
+              </strong>
+            </div>
+
+            <div>
+              <span class="detail-label"> Current Status </span>
+
+              <strong th:text="${licence.verificationStatus}"> PENDING </strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Verification Decision</h2>
+
+          <p>
+            Confirm that the licence information has been checked against the
+            relevant documentation.
+          </p>
+
+          <form
+            th:action="@{'/visitors/licence/' + ${licence.id} + '/verify'}"
+            method="post"
+          >
+            <label for="verifyRemarks"> Verification remarks </label>
+
+            <textarea
+              id="verifyRemarks"
+              name="remarks"
+              placeholder="Optional verification remarks..."
+            >
+            </textarea>
+
+            <div class="page-actions">
+              <button type="submit" class="btn btn-primary">
+                Verify Licence
+              </button>
+
+              <a href="/visitors" class="btn btn-secondary"> Cancel </a>
+            </div>
+          </form>
+
+          <form
+            th:action="@{'/visitors/licence/' + ${licence.id} + '/reject'}"
+            method="post"
+            style="margin-top: 12px"
+          >
+            <label for="rejectRemarks"> Rejection remarks </label>
+
+            <textarea
+              id="rejectRemarks"
+              name="remarks"
+              placeholder="Reason for rejecting this licence..."
+            >
+            </textarea>
+
+            <div class="page-actions">
+              <button type="submit" class="btn btn-secondary">
+                Reject Licence
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <div class="page-actions">
+          <a href="/visitors" class="btn btn-secondary"> Back to Visitors </a>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
