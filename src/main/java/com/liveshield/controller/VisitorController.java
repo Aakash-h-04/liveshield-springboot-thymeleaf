@@ -123,20 +123,45 @@ public class VisitorController {
             @RequestParam String visitorCode,
             Model model) {
 
-        VisitorService.VisitorProfile profile = visitorService.loadProfile(visitorCode);
+        try {
 
-        model.addAttribute(
-                "profile",
-                profile);
+            VisitorService.VisitorProfile profile = visitorService.loadProfile(visitorCode);
 
-        String qrCode = qrCodeService.generateBase64(
-                profile.visitor().getVisitorCode());
+            Visitor visitor = profile.visitor();
 
-        model.addAttribute(
-                "qrCode",
-                qrCode);
+            List<FarmVisit> visitHistory = visitorService.getVisitHistory(visitor.getId());
 
-        return "visitor-profile";
+            List<FarmVisit> recentFarmVisits = visitorService.getRecentFarmVisits(
+                    visitor.getId(),
+                    5);
+
+            model.addAttribute("profile", profile);
+
+            model.addAttribute(
+                    "visitHistory",
+                    visitHistory);
+
+            model.addAttribute(
+                    "recentFarmVisits",
+                    recentFarmVisits);
+
+            String qrCode = qrCodeService.generateBase64(
+                    visitor.getVisitorCode());
+
+            model.addAttribute(
+                    "qrCode",
+                    qrCode);
+
+            return "visitor-profile";
+
+        } catch (IllegalArgumentException ex) {
+
+            model.addAttribute(
+                    "error",
+                    ex.getMessage());
+
+            return "error";
+        }
     }
 
     @GetMapping("/scan")
