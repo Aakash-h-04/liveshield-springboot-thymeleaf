@@ -47,8 +47,8 @@ public class AlertService {
     public Alert createRiskAlert(RiskAssessment assessment) {
 
         System.out.println(
-        ">>> createRiskAlert() CALLED - Risk Level: "
-                + assessment.getRiskLevel());
+                ">>> createRiskAlert() CALLED - Risk Level: "
+                        + assessment.getRiskLevel());
 
         Farm farm = farmService.findById(
                 assessment.getFarm().getId());
@@ -59,17 +59,16 @@ public class AlertService {
                 farm.getId(),
                 "RISK_ASSESSMENT");
 
-
-                System.out.println(
-        ">>> Checking previous risk alert for farm: "
-                + farm.getId());
+        System.out.println(
+                ">>> Checking previous risk alert for farm: "
+                        + farm.getId());
         // Don't create duplicate alerts for the same risk level
         if (latestRiskAlert.isPresent()
                 && severity.equalsIgnoreCase(
                         latestRiskAlert.get().getSeverity())) {
 
-                            System.out.println(
-        ">>> DUPLICATE RISK ALERT - No new alert/email");
+            System.out.println(
+                    ">>> DUPLICATE RISK ALERT - No new alert/email");
 
             return latestRiskAlert.get();
         }
@@ -198,11 +197,29 @@ public class AlertService {
                 alert.getFarm().getName(),
                 alert.getFarm().getId());
 
-        emailNotificationService.sendAlertEmail(
-                adminEmail,
-                subject,
-                message);
-        
-        whatsappNotificationService.sendAlertWhatsApp(message);
+        // Email notification
+        try {
+            emailNotificationService.sendAlertEmail(
+                    adminEmail,
+                    subject,
+                    message);
+
+            System.out.println(">>> ADMIN EMAIL SENT SUCCESSFULLY");
+
+        } catch (Exception e) {
+            System.err.println(
+                    ">>> EMAIL NOTIFICATION FAILED: " + e.getMessage());
+        }
+
+        // WhatsApp notification
+        try {
+            whatsappNotificationService.sendAlertWhatsApp(message);
+
+            System.out.println(">>> ADMIN WHATSAPP SENT SUCCESSFULLY");
+
+        } catch (Exception e) {
+            System.err.println(
+                    ">>> WHATSAPP NOTIFICATION FAILED: " + e.getMessage());
+        }
     }
 }
