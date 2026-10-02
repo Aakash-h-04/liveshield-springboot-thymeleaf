@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -142,6 +143,13 @@ public class VisitorService {
     }
 
     @Transactional(readOnly = true)
+    public List<Visitor> getRegisteredActiveVisitors() {
+
+        return visitorRepository
+                .findByAccountStatusOrderByFullNameAsc("ACTIVE");
+    }
+
+    @Transactional(readOnly = true)
     public long getTodayCheckInCount() {
 
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
@@ -160,8 +168,6 @@ public class VisitorService {
                 .countByCheckOutTimeGreaterThanEqual(
                         startOfDay);
     }
-
-    
 
     /*
      * Generate an opaque visitor identity.

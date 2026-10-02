@@ -60,6 +60,10 @@ public class VisitorController {
         model.addAttribute("activeVisits", activeVisits);
         model.addAttribute("farms", farms);
 
+        model.addAttribute(
+                "registeredActiveVisitors",
+                visitorService.getRegisteredActiveVisitors());
+
         return "visitors";
     }
 

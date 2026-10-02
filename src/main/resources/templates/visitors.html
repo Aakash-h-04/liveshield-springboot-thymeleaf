@@ -229,6 +229,123 @@
         </section>
 
         <!-- =================================================
+ REGISTERED VISITORS
+ ================================================= -->
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Registered Visitors</h3>
+
+              <p>All visitors with an active registered account.</p>
+            </div>
+
+            <span
+              class="verification-status"
+              th:text="${registeredActiveVisitors.size()}"
+            >
+              0
+            </span>
+          </div>
+
+          <!-- No registered visitors -->
+
+          <div th:if="${registeredActiveVisitors.isEmpty()}" class="empty">
+            No registered visitors found.
+          </div>
+
+          <!-- Registered visitor table -->
+
+          <div
+            th:if="${!registeredActiveVisitors.isEmpty()}"
+            class="table-wrapper"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th>Visitor</th>
+
+                  <th>Visitor ID</th>
+
+                  <th>Company</th>
+
+                  <th>Type</th>
+
+                  <th>Mobile</th>
+
+                  <th>Status</th>
+
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr th:each="visitor : ${registeredActiveVisitors}">
+                  <!-- Visitor -->
+
+                  <td>
+                    <strong th:text="${visitor.fullName}">
+                      Visitor Name
+                    </strong>
+                  </td>
+
+                  <!-- Visitor ID -->
+
+                  <td>
+                    <small th:text="${visitor.visitorCode}">
+                      VST-XXXX-XXXX-XXXX
+                    </small>
+                  </td>
+
+                  <!-- Company -->
+
+                  <td
+                    th:text="${visitor.companyName != null
+                                      and !#strings.isEmpty(visitor.companyName)
+                                      ? visitor.companyName
+                                      : '—'}"
+                  >
+                    —
+                  </td>
+
+                  <!-- Type -->
+
+                  <td
+                    th:text="${visitor.visitorType != null
+                                      and !#strings.isEmpty(visitor.visitorType)
+                                      ? visitor.visitorType
+                                      : '—'}"
+                  >
+                    —
+                  </td>
+
+                  <!-- Mobile -->
+
+                  <td th:text="${visitor.mobile}">—</td>
+
+                  <!-- Account Status -->
+
+                  <td>
+                    <span class="badge verified"> ACTIVE </span>
+                  </td>
+
+                  <!-- Action -->
+
+                  <td>
+                    <a
+                      th:href="@{'/visitors/' + ${visitor.visitorCode}}"
+                      class="button secondary"
+                    >
+                      View
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- =================================================
          QUICK ACTIONS
          ================================================= -->
 
