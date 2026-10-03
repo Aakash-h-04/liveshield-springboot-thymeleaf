@@ -283,7 +283,7 @@ public class VisitorService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.List<FarmVisit> getVisitHistory(
+    public List<FarmVisit> getVisitHistory(
             Long visitorId) {
 
         return farmVisitRepository
@@ -291,11 +291,11 @@ public class VisitorService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.List<FarmVisit> getRecentFarmVisits(
+    public List<FarmVisit> getRecentFarmVisits(
             Long visitorId,
             int limit) {
 
-        java.util.List<FarmVisit> visits = farmVisitRepository
+        List<FarmVisit> visits = farmVisitRepository
                 .findByVisitorIdOrderByCheckInTimeDesc(
                         visitorId);
 

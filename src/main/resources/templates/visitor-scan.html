@@ -183,28 +183,39 @@
     </div>
 
     <!-- QR DECODER -->
+    <!-- QR DECODER -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
     <script>
       const video = document.getElementById("camera");
-
       const canvas = document.getElementById("qr-canvas");
-
       const context = canvas.getContext("2d", {
         willReadFrequently: true,
       });
 
       const status = document.getElementById("scan-status");
-
       const startButton = document.getElementById("start-camera");
-
       const stopButton = document.getElementById("stop-camera");
 
       let stream = null;
       let scanning = false;
+      let redirecting = false;
 
       async function startCamera() {
         if (scanning) {
+          return;
+        }
+
+        if (!window.jsQR) {
+          status.textContent =
+            "QR scanner library could not be loaded. Please refresh the page.";
+          console.error("jsQR library is not available.");
+          return;
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          status.textContent =
+            "Camera is not supported by this browser. Please use manual lookup.";
           return;
         }
 
@@ -216,6 +227,12 @@
               facingMode: {
                 ideal: "environment",
               },
+              width: {
+                ideal: 1280,
+              },
+              height: {
+                ideal: 720,
+              },
             },
             audio: false,
           });
@@ -225,16 +242,27 @@
           await video.play();
 
           scanning = true;
+          redirecting = false;
 
           status.textContent =
-            "Camera active. Position the QR code inside the frame.";
+            "Camera active. Place the QR code inside the box.";
 
-          scanFrame();
+          requestAnimationFrame(scanFrame);
         } catch (error) {
-          console.error(error);
+          console.error("Camera error:", error);
 
-          status.textContent =
-            "Camera access failed. Please allow camera permission or use manual lookup.";
+          if (error.name === "NotAllowedError") {
+            status.textContent =
+              "Camera permission was denied. Allow camera access and try again.";
+          } else if (error.name === "NotFoundError") {
+            status.textContent = "No camera was found on this device.";
+          } else if (error.name === "NotReadableError") {
+            status.textContent =
+              "Camera is already being used by another application.";
+          } else {
+            status.textContent =
+              "Unable to start camera. Please use manual lookup.";
+          }
         }
       }
 
@@ -242,7 +270,9 @@
         scanning = false;
 
         if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
+          stream.getTracks().forEach((track) => {
+            track.stop();
+          });
 
           stream = null;
         }
@@ -253,40 +283,71 @@
       }
 
       function scanFrame() {
-        if (!scanning) {
+        if (!scanning || redirecting) {
           return;
         }
 
         if (
-          video.readyState >= 2 &&
+          video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
           video.videoWidth > 0 &&
           video.videoHeight > 0
         ) {
-          canvas.width = video.videoWidth;
+          const width = video.videoWidth;
+          const height = video.videoHeight;
 
-          canvas.height = video.videoHeight;
+          /*
+           * Scan the central region first.
+           * This corresponds roughly to the visible scan box.
+           */
+          const size = Math.min(width, height) * 0.65;
 
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const sx = (width - size) / 2;
+          const sy = (height - size) / 2;
 
-          const imageData = context.getImageData(
+          canvas.width = Math.floor(size);
+          canvas.height = Math.floor(size);
+
+          context.drawImage(
+            video,
+            sx,
+            sy,
+            size,
+            size,
             0,
             0,
             canvas.width,
             canvas.height,
           );
 
-          const result = jsQR(
-            imageData.data,
-            imageData.width,
-            imageData.height,
-            {
-              inversionAttempts: "attemptBoth",
-            },
+          let imageData = context.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height,
           );
+
+          let result = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "attemptBoth",
+          });
+
+          /*
+           * If central scan failed, scan the complete camera frame.
+           */
+          if (!result) {
+            canvas.width = width;
+            canvas.height = height;
+
+            context.drawImage(video, 0, 0, width, height, 0, 0, width, height);
+
+            imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+            result = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "attemptBoth",
+            });
+          }
 
           if (result) {
             handleQrResult(result.data);
-
             return;
           }
         }
@@ -295,23 +356,54 @@
       }
 
       function handleQrResult(value) {
+        if (redirecting) {
+          return;
+        }
+
+        const scannedValue = value.trim();
+
+        console.log("QR detected:", scannedValue);
+
+        /*
+         * Accept exactly the LiveShield visitor ID format:
+         *
+         * VST-XXXX-XXXX-XXXX
+         */
+        const visitorCodePattern = /^VST-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+$/i;
+
+        if (!visitorCodePattern.test(scannedValue)) {
+          status.textContent =
+            "QR detected, but it is not a valid LiveShield visitor ID.";
+
+          return;
+        }
+
+        redirecting = true;
         scanning = false;
 
-        status.textContent = "QR detected: " + value;
+        status.textContent = "Visitor identified. Loading profile...";
 
-        if (/^VST-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+$/.test(value)) {
-          status.textContent = "Visitor identified. Loading profile...";
+        if (stream) {
+          stream.getTracks().forEach((track) => {
+            track.stop();
+          });
 
-          window.location.href =
-            "/visitors/lookup?visitorCode=" + encodeURIComponent(value);
-        } else {
-          status.textContent =
-            "This QR code is not a valid LiveShield visitor code.";
-
-          scanning = true;
-
-          requestAnimationFrame(scanFrame);
+          stream = null;
         }
+
+        /*
+         * IMPORTANT:
+         * Use the exact value returned by the QR scanner.
+         */
+        const encodedVisitorCode = encodeURIComponent(
+          scannedValue.toUpperCase(),
+        );
+
+        const lookupUrl = "/visitors/lookup?visitorCode=" + encodedVisitorCode;
+
+        console.log("Redirecting to:", lookupUrl);
+
+        window.location.assign(lookupUrl);
       }
 
       startButton.addEventListener("click", startCamera);
@@ -319,6 +411,13 @@
       stopButton.addEventListener("click", stopCamera);
 
       window.addEventListener("beforeunload", stopCamera);
+
+      /*
+       * Automatically start the camera when the page loads.
+       */
+      window.addEventListener("load", () => {
+        startCamera();
+      });
     </script>
   </body>
 </html>

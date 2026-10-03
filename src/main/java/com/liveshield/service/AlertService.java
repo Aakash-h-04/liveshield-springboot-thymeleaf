@@ -19,20 +19,26 @@ public class AlertService {
     private final EmailNotificationService emailNotificationService;
     private final WhatsAppNotificationService whatsappNotificationService;
 
-    @Value("${liveshield.admin.email}")
-    private String adminEmail;
+    private final String[] adminEmails;
 
     public AlertService(
             AlertRepository repository,
             FarmService farmService,
             EmailNotificationService emailNotificationService,
-            WhatsAppNotificationService whatsAppNotificationService) {
+            WhatsAppNotificationService whatsAppNotificationService,
+            @Value("${liveshield.admin.emails}") String adminEmails) {
 
         this.repository = repository;
         this.farmService = farmService;
         this.emailNotificationService = emailNotificationService;
         this.whatsappNotificationService = whatsAppNotificationService;
 
+        this.adminEmails = adminEmails
+                .split(",");
+
+        for (int i = 0; i < this.adminEmails.length; i++) {
+            this.adminEmails[i] = this.adminEmails[i].trim();
+        }
     }
 
     public List<Alert> findAll() {
@@ -62,6 +68,7 @@ public class AlertService {
         System.out.println(
                 ">>> Checking previous risk alert for farm: "
                         + farm.getId());
+
         // Don't create duplicate alerts for the same risk level
         if (latestRiskAlert.isPresent()
                 && severity.equalsIgnoreCase(
@@ -108,13 +115,15 @@ public class AlertService {
 
         Alert savedAlert = repository.save(alert);
 
-        System.out.println(">>> NEW ALERT CREATED: " + savedAlert.getTitle());
-        System.out.println(">>> ADMIN EMAIL: " + adminEmail);
+        System.out.println(
+                ">>> NEW ALERT CREATED: "
+                        + savedAlert.getTitle());
 
         sendEmailNotification(savedAlert);
 
-        System.out.println(">>> EMAIL SENT FOR ALERT: "
-                + savedAlert.getTitle());
+        System.out.println(
+                ">>> EMAIL SENT FOR ALERT: "
+                        + savedAlert.getTitle());
 
         return savedAlert;
     }
@@ -147,14 +156,15 @@ public class AlertService {
 
         Alert savedAlert = repository.save(alert);
 
-        System.out.println(">>> NEW VETERINARY ALERT CREATED: "
-                + savedAlert.getTitle());
-        System.out.println(">>> ADMIN EMAIL: " + adminEmail);
+        System.out.println(
+                ">>> NEW VETERINARY ALERT CREATED: "
+                        + savedAlert.getTitle());
 
         sendEmailNotification(savedAlert);
 
-        System.out.println(">>> EMAIL SENT FOR ALERT: "
-                + savedAlert.getTitle());
+        System.out.println(
+                ">>> EMAIL SENT FOR ALERT: "
+                        + savedAlert.getTitle());
 
         return savedAlert;
     }
@@ -173,7 +183,9 @@ public class AlertService {
 
     private void sendEmailNotification(Alert alert) {
 
-        String subject = "LiveShield Alert: " + alert.getTitle();
+        String subject =
+                "LiveShield Alert: "
+                        + alert.getTitle();
 
         String message = """
                 LiveShield Alert
@@ -197,29 +209,53 @@ public class AlertService {
                 alert.getFarm().getName(),
                 alert.getFarm().getId());
 
-        // Email notification
-        try {
-            emailNotificationService.sendAlertEmail(
-                    adminEmail,
-                    subject,
-                    message);
+        // =====================================================
+        // EMAIL NOTIFICATIONS
+        // =====================================================
 
-            System.out.println(">>> ADMIN EMAIL SENT SUCCESSFULLY");
+        for (String adminEmail : adminEmails) {
 
-        } catch (Exception e) {
-            System.err.println(
-                    ">>> EMAIL NOTIFICATION FAILED: " + e.getMessage());
+            if (adminEmail.isBlank()) {
+                continue;
+            }
+
+            try {
+
+                emailNotificationService.sendAlertEmail(
+                        adminEmail,
+                        subject,
+                        message);
+
+                System.out.println(
+                        ">>> ADMIN EMAIL SENT SUCCESSFULLY TO: "
+                                + adminEmail);
+
+            } catch (Exception e) {
+
+                System.err.println(
+                        ">>> EMAIL NOTIFICATION FAILED FOR "
+                                + adminEmail
+                                + ": "
+                                + e.getMessage());
+            }
         }
 
-        // WhatsApp notification
+        // =====================================================
+        // WHATSAPP NOTIFICATIONS
+        // =====================================================
+
         try {
+
             whatsappNotificationService.sendAlertWhatsApp(message);
 
-            System.out.println(">>> ADMIN WHATSAPP SENT SUCCESSFULLY");
+            System.out.println(
+                    ">>> ADMIN WHATSAPP NOTIFICATIONS SENT SUCCESSFULLY");
 
         } catch (Exception e) {
+
             System.err.println(
-                    ">>> WHATSAPP NOTIFICATION FAILED: " + e.getMessage());
+                    ">>> WHATSAPP NOTIFICATION FAILED: "
+                            + e.getMessage());
         }
     }
 }
